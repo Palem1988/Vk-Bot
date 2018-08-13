@@ -1,5 +1,6 @@
 const vk = require('vk-chat-bot') // vk-chat-bot library
 const moment = require('moment') // For easy time formatting
+const state = require('./state')
 
 var params = {
   vk_token: process.env.VK_API_KEY, // VK API token
@@ -80,6 +81,145 @@ core.regex(/h(i|ello|ey)/i, $ => {
   $.text('Hello, I am a test bot. You said: ' + $.msg)
 })
 
+core.regex(/sup/i, $ => {
+  $.text('Hello brother: ' + $.msg)
+})
+
+core.regex(/menu/i, $ =>{
+  var kbd = new Keyboard([
+    // Rows
+    [
+      new Button('Subscription'),
+      new Button('Settings', colors.primary),
+      new Button('Help', colors.negative),
+      new Button('Feedback', colors.positive),
+
+    ],
+    [
+      new Button('Remove')
+    ],
+  ], false)
+
+  $.text('Here is your keyboard, as promised.')
+  $.keyboard(kbd)
+},
+)
+//end of menu
+
+//handling the buttons in the menu (remove button)
+core.regex(/Remove/, $ =>{
+  $.text('Ok, ok, no keyboard for you.')
+  $.removeKeyboard()
+})
+
+//handling manage Subscription button
+core.regex(/Subscription/, $ =>{
+  $.text(" Here's your subscription menu")
+  var kbd = new Keyboard([
+    // Rows
+    [
+      new Button('Subscribe coin'),
+      new Button('Unsubscribe coin', colors.primary),
+    ],
+    [
+      new Button('View All', colors.negative),
+      new Button('Menu', colors.positive)
+    ]
+  ], false)
+  $.keyboard(kbd)
+})
+
+//handling settings menu
+core.regex(/Settings/, $ =>{
+  $.text("Please choose your preffered language")
+  var kbd = new Keyboard([
+    [
+    new Button('English',colors.primary),
+    new Button('Russian',colors.positive),
+    new Button('Remove',colors.negative),
+    new Button('Menu')
+    ]
+  ], false)
+  $.keyboard(kbd)
+})
+
+//handling Feedback button
+core.regex(/Feedback/, $ =>{
+  state.processState('Feedback', $)
+})
+
+//handling Subscribe button
+core.regex(/Subscribe coin/, $ =>{
+  state.processState('Subscribe coin', $)
+})
+
+//handling Unsubscribe button
+core.regex(/Unsubscribe coin/,$ =>{
+  state.processState('Unsubscribe coin', $)
+  var kbd = new Keyboard([
+    // Rows
+    [
+      new Button('coin1'),
+      new Button('coin2', colors.primary),
+    ],
+    [
+      new Button('coin3', colors.negative),
+      new Button('coin4', colors.positive)
+    ],
+    [
+      new Button('coin5'),
+      new Button('coin6', colors.primary),
+    ],
+    [
+      new Button('coin7', colors.negative),
+      new Button('Back', colors.positive)
+    ],
+  ], false)
+  $.keyboard(kbd)
+})
+
+//handling View All button
+core.regex(/View All/, $ =>{
+  $.text("Here is the list of all coins")
+  var kbd = new Keyboard([
+    // Rows
+    [
+      new Button('coin1'),
+      new Button('coin2', colors.primary),
+    ],
+    [
+      new Button('coin3', colors.negative),
+      new Button('coin4', colors.positive)
+    ],
+    [
+      new Button('coin5'),
+      new Button('coin6', colors.primary),
+    ],
+    [
+      new Button('coin7', colors.negative),
+      new Button('Back', colors.positive)
+    ],
+  ], false)
+  $.keyboard(kbd)
+})
+
+//handling back button
+core.regex(/Back/, $ =>{
+  $.text(" Here's your subscription menu")
+  var kbd = new Keyboard([
+    // Rows
+    [
+      new Button('Subscribe coin'),
+      new Button('Unsubscribe coin', colors.primary),
+    ],
+    [
+      new Button('View All', colors.negative),
+      new Button('Menu', colors.positive)
+    ]
+  ], false)
+  $.keyboard(kbd)
+})
+
 core.on('no_match', $ => {
   $.text("I don't know how to respond.")
 })
@@ -96,7 +236,17 @@ core.on('message_typing_state', $ => {
 core.on('handler_error', $ => {
   $.text("Oops, looks like something went wrong.")
 })
-
+//
+// function Feedback($){
+//   $.text("We are eagerly waiting for your feedback")
+// }
+//
+// var state;
+// function processState(state, $){
+//   switch(state){
+//     case 'Feedback': return Feedback($)
+//   }
+// }
 core.noEventWarnings() // Prevent warnings about missing event handlers
 
 bot.start() // Start the bot
